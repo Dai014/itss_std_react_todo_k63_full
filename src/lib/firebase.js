@@ -3,12 +3,12 @@ import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAbZcZpdImMPTcMYRX-eyZ12RNK10lbs08",
-  authDomain: "fir-sample-7b168.firebaseapp.com",
-  projectId: "fir-sample-7b168",
-  storageBucket: "fir-sample-7b168.appspot.com",
-  messagingSenderId: "811206240316",
-  appId: "1:811206240316:web:d43ab7fdeb90195302fb39"
+  apiKey: "AIzaSyBWVIFUL9_eXajsAB-WQYY2vrifMhGL3dk",
+  authDomain: "fir-project-ff49f.firebaseapp.com",
+  projectId: "fir-project-ff49f",
+  storageBucket: "fir-project-ff49f.appspot.com",
+  messagingSenderId: "722637539737",
+  appId: "1:722637539737:web:e038caf24751ec1c966b08"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -58,3 +58,50 @@ export const clearFirebaseItem = async (item) => {
   });
 };
 
+export const uiConfig = {
+  signInFlow: 'popup',
+  signInSuccessUrl: "/",
+  signInOptions: [
+    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+  ],
+}
+
+export const storeUserInfo = async (user) => {
+  const { uid } = user;
+  const userDoc = await db.collection("users").doc(uid).get();
+  if (!userDoc.exists) {
+    await db.collection("users").doc(uid).set({ name: user.displayName });
+    return {
+      name: user.displayName,
+      id: uid,
+    };
+  } else {
+    return {
+      id: uid,
+      ...userDoc.data(),
+    };
+  }
+}
+
+export const updateUser = async (user, image) => {
+  try {
+    const userDoc = await firebase.firestore().collection("users").doc(user.id).get();
+    if (userDoc.exists) {
+      await firebase.firestore().collection("users").doc(user.id).update({ ...userDoc.data(), image: image });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export const uploadImage = async (image) => {
+  const ref = firebase.storage().ref().child(`/images/${image.name}`);
+  let downloadUrl = "";
+  try {
+    await ref.put(image);
+    downloadUrl = await ref.getDownloadURL();
+  } catch (err) {
+    console.log(err);
+  }
+  return downloadUrl;
+};
