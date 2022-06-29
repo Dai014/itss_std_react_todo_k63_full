@@ -2,15 +2,59 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 
-
 const firebaseConfig = {
-  apiKey: "AIzaSyBWVIFUL9_eXajsAB-WQYY2vrifMhGL3dk",
-  authDomain: "fir-project-ff49f.firebaseapp.com",
-  projectId: "fir-project-ff49f",
-  storageBucket: "fir-project-ff49f.appspot.com",
-  messagingSenderId: "722637539737",
-  appId: "1:722637539737:web:e038caf24751ec1c966b08"
+  apiKey: "AIzaSyAbZcZpdImMPTcMYRX-eyZ12RNK10lbs08",
+  authDomain: "fir-sample-7b168.firebaseapp.com",
+  projectId: "fir-sample-7b168",
+  storageBucket: "fir-sample-7b168.appspot.com",
+  messagingSenderId: "811206240316",
+  appId: "1:811206240316:web:d43ab7fdeb90195302fb39"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+export const auth = firebase.auth();
+export default firebase;
+
+export const getFirebaseItems = async () => {
+  try {
+    const snapshot = await db
+      .collection("todo")
+      .get();
+    const items = snapshot.docs.map(
+      (doc) => ({ ...doc.data(), id: doc.id })
+    );
+    return items;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+}
+
+export const addFirebaseItem = async (item) => {
+  try {
+    const todoRef = db.collection("todo");
+    await todoRef.add(item);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export const updateFirebaseItem = async (item, id) => {
+  try {
+    const todoRef = db.collection("todo").doc(id);
+    await todoRef.update(item);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export const clearFirebaseItem = async (item) => {
+  const todoRef = db.collection("todo").doc(item.id);
+  await todoRef.delete().then(function () {
+  }).catch(function (err) {
+    console.log(err);
+  });
+};
+
